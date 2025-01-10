@@ -47,7 +47,7 @@ const handler = async (req: AuthenticatedRequest, res: NextApiResponse) => {
       });
       if (existingPayment) {
         return res.status(400).json({
-          message: "Payment already exists for this user with the same title",
+          message: "Payment already exists with the same title",
         });
       }
 

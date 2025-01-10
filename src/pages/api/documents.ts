@@ -45,7 +45,7 @@ const handler = async (req: AuthenticatedRequest, res: NextApiResponse) => {
       });
       if (existingDocument) {
         return res.status(400).json({
-          message: "Document already exists for this user with the same title",
+          message: "Document already exists with the same title",
         });
       }
 
