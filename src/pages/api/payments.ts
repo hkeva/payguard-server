@@ -1,4 +1,3 @@
-import Joi from "joi";
 import DatabaseConnect from "@/config/mongodb";
 import { NextApiResponse } from "next";
 import Payment from "@/models/payment";
@@ -23,54 +22,6 @@ const handler = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   // check for permission
   const isAdminRoute = req.method === "GET" || req.method === "PATCH";
   await authMiddleware(req, res, isAdminRoute);
-
-  // create payment
-  if (req.method == "POST") {
-    const { title, amount } = req.body;
-
-    const schema = Joi.object({
-      title: Joi.string().required().messages({
-        "any.required": "Title is required",
-      }),
-      amount: Joi.number().min(0).required().messages({
-        "any.required": "Amount is required",
-        "number.min": "Amount must be a positive number",
-      }),
-    });
-
-    try {
-      await schema.validateAsync({ title, amount }, { abortEarly: false });
-
-      const existingPayment = await Payment.findOne({
-        userId: req.user?._id,
-        title,
-      });
-      if (existingPayment) {
-        return res.status(400).json({
-          message: "Payment already exists with the same title",
-        });
-      }
-
-      const newPayment = new Payment({
-        title,
-        amount,
-        userId: req.user?._id,
-        status: "pending",
-      });
-
-      await newPayment.save();
-
-      return res
-        .status(201)
-        .json({ message: "Payment created successfully", payment: newPayment });
-    } catch (error: unknown) {
-      const e = error as Error;
-      console.error("Validation or payment creation error:", e);
-      return res
-        .status(400)
-        .json({ message: e.message || "Something went wrong!" });
-    }
-  }
 
   // get payment list
   if (req.method === "GET") {

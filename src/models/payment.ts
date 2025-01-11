@@ -5,6 +5,7 @@ interface IPayment extends Document {
   amount: number;
   status: "pending" | "approved" | "rejected";
   userId: mongoose.Types.ObjectId;
+  transactionId: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,6 +28,10 @@ const paymentSchema = new Schema<IPayment>(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
+    },
+    transactionId: {
+      type: String,
       required: true,
     },
   },

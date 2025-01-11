@@ -39,6 +39,7 @@ const handler = async (req: AuthenticatedRequest, res: NextApiResponse) => {
     try {
       await schema.validateAsync({ title, fileUrl }, { abortEarly: false });
 
+      // check for existing document with same title
       const existingDocument = await DocumentModel.findOne({
         userId: req.user?._id,
         title,
