@@ -31,13 +31,26 @@ PayGuard is a very simple payment and document management system with user and a
   - Create new payments and documents.
   - View a list of their created payments and documents.
 
-## Technologies Used
+## Technologies & Packages Used
 
-- **Supabase** for authentication
+- **Supabase** for authentication and storage
 - **Stripe** for payment integration
 - **MongoDB** for database
 - **Nodemailer**: for sending emails
 - **Joi**: for data validation
+
+### Environment Variables
+
+```bash
+MONGODB_URI=<Your MongoDB Connection String>
+SUPABASE_URL=<Your Supabase Project URL>
+SUPABASE_ANON_KEY=<Your Supabase Anon Key>
+SMTP_USER=<Your SMTP User Email>
+SMTP_PASSWORD=<Your SMTP User Password>
+STRIPE_SECRET_KEY=<Your Stripe Secret Key>
+NEXT_PUBLIC_URL=<Your Project URL>
+
+```
 
 ### Run project
 
