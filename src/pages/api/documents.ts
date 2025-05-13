@@ -85,7 +85,10 @@ const handler = async (req: AuthenticatedRequest, res: NextApiResponse) => {
         filters.status = status as string;
       }
 
-      const documents = await DocumentModel.find(filters);
+      const documents = await DocumentModel.find(filters).populate(
+        "userId",
+        "email"
+      );
 
       return res.status(200).json({
         message: "Document list fetched successfully",

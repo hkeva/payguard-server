@@ -40,7 +40,7 @@ const handler = async (req: AuthenticatedRequest, res: NextApiResponse) => {
         filters.amount = { $eq: Number(amount) };
       }
 
-      const payments = await Payment.find(filters);
+      const payments = await Payment.find(filters).populate("userId", "email");
 
       return res.status(200).json({
         message: "Payment list fetched successfully",
