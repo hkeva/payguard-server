@@ -15,19 +15,31 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   // get users list
   if (req.method === "GET") {
     try {
-      const { id, name, email } = req.query;
+      const { name, email, page = 1, limit = 10 } = req.query;
 
       const filters = {
-        ...(id && { _id: id }),
         ...(name && { name }),
         ...(email && { email }),
       };
 
-      const users = await User.find(filters);
+      const pageNumber = parseInt(page as string, 10);
+      const limitNumber = parseInt(limit as string, 10);
+      const skip = (pageNumber - 1) * limitNumber;
+
+      const [users, total] = await Promise.all([
+        User.find(filters).skip(skip).limit(limitNumber),
+        User.countDocuments(filters),
+      ]);
 
       return res.status(200).json({
         message: "User list fetched successfully",
         data: users,
+        meta: {
+          total,
+          page: pageNumber,
+          limit: limitNumber,
+          totalPages: Math.ceil(total / limitNumber),
+        },
       });
     } catch (error) {
       console.error("Error fetching users:", error);

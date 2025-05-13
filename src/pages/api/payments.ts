@@ -26,7 +26,7 @@ const handler = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   // get payment list
   if (req.method === "GET") {
     try {
-      const { title, status, amount } = req.query;
+      const { title, status, amount, page = 1, limit = 10 } = req.query;
 
       const filters: IFilters = {};
 
@@ -40,11 +40,27 @@ const handler = async (req: AuthenticatedRequest, res: NextApiResponse) => {
         filters.amount = { $eq: Number(amount) };
       }
 
-      const payments = await Payment.find(filters).populate("userId", "email");
+      const pageNumber = parseInt(page as string, 10);
+      const limitNumber = parseInt(limit as string, 10);
+      const skip = (pageNumber - 1) * limitNumber;
+
+      const [payments, total] = await Promise.all([
+        Payment.find(filters)
+          .populate("userId", "email")
+          .skip(skip)
+          .limit(limitNumber),
+        Payment.countDocuments(filters),
+      ]);
 
       return res.status(200).json({
         message: "Payment list fetched successfully",
         data: payments,
+        meta: {
+          total,
+          page: pageNumber,
+          limit: limitNumber,
+          totalPages: Math.ceil(total / limitNumber),
+        },
       });
     } catch (error) {
       console.error("Error fetching payments:", error);

@@ -74,7 +74,7 @@ const handler = async (req: AuthenticatedRequest, res: NextApiResponse) => {
   // get document list
   if (req.method === "GET") {
     try {
-      const { title, status } = req.query;
+      const { title, status, page = 1, limit = 10 } = req.query;
 
       const filters: IFilters = {};
 
@@ -85,14 +85,27 @@ const handler = async (req: AuthenticatedRequest, res: NextApiResponse) => {
         filters.status = status as string;
       }
 
-      const documents = await DocumentModel.find(filters).populate(
-        "userId",
-        "email"
-      );
+      const pageNumber = parseInt(page as string, 10);
+      const limitNumber = parseInt(limit as string, 10);
+      const skip = (pageNumber - 1) * limitNumber;
+
+      const [documents, total] = await Promise.all([
+        DocumentModel.find(filters)
+          .populate("userId", "email")
+          .skip(skip)
+          .limit(limitNumber),
+        DocumentModel.countDocuments(filters),
+      ]);
 
       return res.status(200).json({
         message: "Document list fetched successfully",
         data: documents,
+        meta: {
+          total,
+          page: pageNumber,
+          limit: limitNumber,
+          totalPages: Math.ceil(total / limitNumber),
+        },
       });
     } catch (error) {
       console.error("Error fetching documents:", error);
