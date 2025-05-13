@@ -121,6 +121,25 @@ const handler = async (req: AuthenticatedRequest, res: NextApiResponse) => {
       return res.status(500).json({ error: "Internal server error" });
     }
   }
+
+  if (req.method === "DELETE") {
+    // Validate Id
+    const { id } = req.query;
+    if (typeof id !== "string" || !mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    try {
+      await Payment.deleteOne({ _id: id });
+
+      return res.status(200).json({
+        message: "Payment deleted successfully",
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
 };
 
 export default handler;
